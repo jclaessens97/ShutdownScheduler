@@ -7,6 +7,7 @@ using System.Windows.Forms.VisualStyles;
 namespace ShutdownScheduler.custom
 {
     /// <summary>
+    /// Custom Radiobuttonlist, based on CheckboxList but with radiobuttons
     /// Source: https://stackoverflow.com/a/41355419
     /// </summary>
     public partial class RadioButtonList : ListBox

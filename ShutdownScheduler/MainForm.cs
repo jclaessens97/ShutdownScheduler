@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.Hosting;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ShutdownScheduler
@@ -16,6 +8,7 @@ namespace ShutdownScheduler
     {
         #region Data
 
+        //Button text states
         private const string BTN_TEXT_CANCEL = "Cancel";
         private const string BTN_TEXT_SCHEDULE = "Schedule shutdown";
 
@@ -25,6 +18,7 @@ namespace ShutdownScheduler
         private const int MINS_MAX = 10080;
         private const int HRS_MAX = 168;
 
+        //Enums to use as datasource in dropdown and radiobuttonlist
         private enum TimeTypes : byte
         {
             Milliseconds = 0,
@@ -39,9 +33,10 @@ namespace ShutdownScheduler
             Restart
         }
 
-        private bool scheduled;
-        private bool showCustomMessagebox;
+        private bool scheduled; //true if a shutdown is scheduled, false if not
+        private bool showCustomMessagebox; //true if custom messagebox needs to show, false if not
 
+        //Property for scheduled, sets according buttontext on set
         public bool Scheduled
         {
             get => scheduled;
@@ -70,6 +65,11 @@ namespace ShutdownScheduler
 
         #region Events
 
+        /// <summary>
+        /// Sets maximum according to selected timetype
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbTimeType_SelectedIndexChanged(object sender, EventArgs e)
         {
             var cb = sender as ComboBox;
@@ -90,12 +90,22 @@ namespace ShutdownScheduler
             }
         }
 
+        /// <summary>
+        /// Sets if custom msgbox needs to show or not 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbCustomMessagebox_CheckedChanged(object sender, EventArgs e)
         {
             var cb = sender as CheckBox;
             showCustomMessagebox = cb.Checked;
         }
 
+        /// <summary>
+        /// Button click event to schedule / cancel a shutdown 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnShutdownOrCancel_Click(object sender, EventArgs e)
         {
             if (Scheduled)
@@ -108,6 +118,11 @@ namespace ShutdownScheduler
             }
         }
 
+        /// <summary>
+        /// Button lick event to show what the messagebox checkbox does
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pbHelpIcon_Click(object sender, EventArgs e)
         {
             var msg = "Windows 10 shows own messages about scheduled shutdowns, but sometimes they fail.";
@@ -116,6 +131,11 @@ namespace ShutdownScheduler
             ShowMessageBox(msg);
         }
 
+        /// <summary>
+        /// Fires terminate event on form closing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Terminate();
@@ -125,6 +145,12 @@ namespace ShutdownScheduler
 
         #region Methods
 
+        /// <summary>
+        /// Loads begin state of the window:
+        ///     - version number
+        ///     - assigns data sources
+        ///     - set controls beginstate according to settingsfile
+        /// </summary>
         private void Init()
         {
             this.Text += "- v" + Application.ProductVersion;
@@ -137,6 +163,9 @@ namespace ShutdownScheduler
             Scheduled = Properties.Settings.Default.Scheduled;
         }
 
+        /// <summary>
+        /// Creates command to schedule the shutdown and let it execute
+        /// </summary>
         private void Schedule()
         {
             string command = "shutdown";
@@ -172,6 +201,9 @@ namespace ShutdownScheduler
             }
         }
 
+        /// <summary>
+        /// Creates command to cancel the shutdown and let it execute
+        /// </summary>
         private void Cancel()
         {
             string command = "shutdown /a";
@@ -184,6 +216,9 @@ namespace ShutdownScheduler
             }
         }
 
+        /// <summary>
+        /// Saves control states to settings on exit of the window
+        /// </summary>
         private void Terminate()
         {
             Properties.Settings.Default.Time = Int32.Parse(numTime.Text);
@@ -197,6 +232,12 @@ namespace ShutdownScheduler
 
         #region Auxilary Methods
 
+        /// <summary>
+        /// Converts the stated timetype to seconds, needed for the command
+        /// </summary>
+        /// <param name="timeToConvert"></param>
+        /// <param name="timeType"></param>
+        /// <returns></returns>
         private double ConvertToSecs(int timeToConvert, TimeTypes timeType)
         {
             TimeSpan ts = new TimeSpan();
@@ -221,6 +262,10 @@ namespace ShutdownScheduler
             return ts.TotalSeconds;
         }
 
+        /// <summary>
+        /// Opens a cmd process and executes the command created
+        /// </summary>
+        /// <param name="cmd"></param>
         private void ExecuteCommand(string cmd)
         {
             Debug.WriteLine(cmd);
@@ -235,11 +280,14 @@ namespace ShutdownScheduler
             //p.WaitForExit();
         }
 
+        /// <summary>
+        /// Show messagebox with the given msg
+        /// </summary>
+        /// <param name="msg"></param>
         private void ShowMessageBox(string msg)
         {
             MessageBox.Show(this, msg, "ShutdownScheduler");
         }
-
 
         #endregion
     }
