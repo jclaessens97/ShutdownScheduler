@@ -13,6 +13,17 @@ namespace ShutdownScheduler
 {
     public partial class MainForm : Form
     {
+        #region Data
+
+        private const string BTN_TEXT_CANCEL = "Cancel";
+        private const string BTN_TEXT_SCHEDULE = "Schedule shutdown";
+
+        //Set to one week each
+        private const int MILLIS_MAX = 604800000;
+        private const int SECS_MAX = 604800;
+        private const int MINS_MAX = 10080;
+        private const int HRS_MAX = 168;
+
         private enum TimeTypes : byte
         {
             Milliseconds = 0,
@@ -20,14 +31,40 @@ namespace ShutdownScheduler
             Minutes,
             Hours
         }
+        private enum ShutdownTypes : byte
+        {
+            Shutdown = 0,
+            Logoff,
+            Restart
+        }
+
+        private bool scheduled;
         private bool showCustomMessagebox;
+
+        public bool Scheduled
+        {
+            get => scheduled;
+            set
+            {
+                scheduled = value;
+
+                if (scheduled)
+                {
+                    btnShutdownOrCancel.Text = BTN_TEXT_CANCEL;
+                }
+                else
+                {
+                    btnShutdownOrCancel.Text = BTN_TEXT_SCHEDULE;
+                }
+            }
+        }
+
+        #endregion
 
         public MainForm()
         {
             InitializeComponent();
-            cbTimeType.DataSource = Enum.GetValues(typeof(TimeTypes));
-            cbTimeType.SelectedItem = TimeTypes.Milliseconds;
-            showCustomMessagebox = cbCustomMessagebox.Checked;
+            Init();
         }
 
         #region Events
@@ -37,18 +74,17 @@ namespace ShutdownScheduler
             var cb = sender as ComboBox;
             switch (cb.SelectedItem)
             {
-                //TODO set maximum according
                 case TimeTypes.Milliseconds:
-                    numTime.Maximum = 10000;
+                    numTime.Maximum = MILLIS_MAX;
                     break;
                 case TimeTypes.Seconds:
-                    numTime.Maximum = 10000;
+                    numTime.Maximum = SECS_MAX;
                     break;
                 case TimeTypes.Minutes:
-                    numTime.Maximum = 10000;
+                    numTime.Maximum = MINS_MAX;
                     break;
                 case TimeTypes.Hours:
-                    numTime.Maximum = 200;
+                    numTime.Maximum = HRS_MAX;
                     break;
             }
         }
@@ -61,15 +97,13 @@ namespace ShutdownScheduler
 
         private void btnShutdownOrCancel_Click(object sender, EventArgs e)
         {
-            if (btnShutdownOrCancel.Text == "Cancel")
+            if (Scheduled)
             {
                 Cancel();
-                btnShutdownOrCancel.Text = "Schedule shutdown";
             }
             else
             {
                 Schedule();
-                btnShutdownOrCancel.Text = "Cancel";
             }
         }
 
@@ -81,29 +115,45 @@ namespace ShutdownScheduler
             ShowMessageBox(msg);
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Terminate();
+        }
+
         #endregion
 
         #region Methods
+
+        private void Init()
+        {
+            cbTimeType.DataSource = Enum.GetValues(typeof(TimeTypes));
+            rblShutdownTypes.DataSource = Enum.GetValues(typeof(ShutdownTypes));
+
+            numTime.Text = Properties.Settings.Default.Time.ToString();
+            cbTimeType.SelectedIndex = Properties.Settings.Default.TimeType;
+            rblShutdownTypes.SelectedIndex = Properties.Settings.Default.ShutdownType;
+            Scheduled = Properties.Settings.Default.Scheduled;
+        }
 
         private void Schedule()
         {
             string command = "shutdown";
             string msg = string.Empty;
 
-            if (rbShutdown.Checked)
+            switch (rblShutdownTypes.SelectedItem)
             {
-                command += " /s";
-                msg = "Shutdown ";
-            }
-            else if (rbLogOff.Checked)
-            {
-                command += " /l";
-                msg = "Log off ";
-            }
-            else if (rbRestart.Checked)
-            {
-                command += " /r";
-                msg = "Restart ";
+                case ShutdownTypes.Shutdown:
+                    command += " /s";
+                    msg = "Shutdown";
+                    break;
+                case ShutdownTypes.Logoff:
+                    command += " /l";
+                    msg = "Logoff";
+                    break;
+                case ShutdownTypes.Restart:
+                    command += " /r";
+                    msg = "Restart";
+                    break;
             }
 
             var timeTypes = (TimeTypes) cbTimeType.SelectedIndex;
@@ -111,6 +161,7 @@ namespace ShutdownScheduler
             command += " /t " + time;
 
             ExecuteCommand(command);
+            Scheduled = true;
 
             if (showCustomMessagebox)
             {
@@ -123,11 +174,21 @@ namespace ShutdownScheduler
         {
             string command = "shutdown /a";
             ExecuteCommand(command);
+            Scheduled = false;
 
             if (showCustomMessagebox)
             {
                 ShowMessageBox("Scheduled shutdown is canceled!");
             }
+        }
+
+        private void Terminate()
+        {
+            Properties.Settings.Default.Time = Int32.Parse(numTime.Text);
+            Properties.Settings.Default.TimeType = (byte) cbTimeType.SelectedIndex;
+            Properties.Settings.Default.ShutdownType = (byte) rblShutdownTypes.SelectedIndex;
+            Properties.Settings.Default.Scheduled = scheduled;
+            Properties.Settings.Default.Save();
         }
 
         #endregion
@@ -178,5 +239,7 @@ namespace ShutdownScheduler
         }
 
         #endregion
+
+
     }
 }
