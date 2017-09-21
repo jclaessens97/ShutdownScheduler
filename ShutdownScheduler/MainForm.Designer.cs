@@ -48,7 +48,7 @@
             this.btnShutdownOrCancel.Location = new System.Drawing.Point(11, 138);
             this.btnShutdownOrCancel.Margin = new System.Windows.Forms.Padding(2);
             this.btnShutdownOrCancel.Name = "btnShutdownOrCancel";
-            this.btnShutdownOrCancel.Size = new System.Drawing.Size(275, 28);
+            this.btnShutdownOrCancel.Size = new System.Drawing.Size(321, 28);
             this.btnShutdownOrCancel.TabIndex = 0;
             this.btnShutdownOrCancel.Text = "Schedule shutdown";
             this.btnShutdownOrCancel.UseVisualStyleBackColor = true;
@@ -81,7 +81,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox1.Size = new System.Drawing.Size(275, 104);
+            this.groupBox1.Size = new System.Drawing.Size(321, 104);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Shutdown options";
@@ -134,16 +134,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(293, 173);
+            this.ClientSize = new System.Drawing.Size(339, 173);
             this.Controls.Add(this.pbHelpIcon);
             this.Controls.Add(this.cbCustomMessagebox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnShutdownOrCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "ShutdownScheduler";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.numTime)).EndInit();
             this.groupBox1.ResumeLayout(false);

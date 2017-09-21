@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Hosting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -126,6 +127,7 @@ namespace ShutdownScheduler
 
         private void Init()
         {
+            this.Text += "- v" + Application.ProductVersion;
             cbTimeType.DataSource = Enum.GetValues(typeof(TimeTypes));
             rblShutdownTypes.DataSource = Enum.GetValues(typeof(ShutdownTypes));
 
@@ -238,8 +240,7 @@ namespace ShutdownScheduler
             MessageBox.Show(this, msg, "ShutdownScheduler");
         }
 
+
         #endregion
-
-
     }
 }
