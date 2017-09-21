@@ -7,4 +7,4 @@
 - Cancel shutdown
 
 ## Screenshots
-![Screenshot 1](https://imgur.com/5adZUee "Screenshot 1")
+![Screenshot 1](https://i.imgur.com/5adZUee.png "Screenshot 1")
